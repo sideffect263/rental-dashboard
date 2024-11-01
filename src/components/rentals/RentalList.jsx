@@ -1,4 +1,3 @@
-// src/components/rentals/RentalList.jsx
 import { useState, useEffect } from 'react';
 import {
   Box,
@@ -17,10 +16,37 @@ import {
 import { DataGrid } from '@mui/x-data-grid';
 import { getRentalPosts } from '../../services/firebase';
 
-// Rest of the component code remains the same...
 const RentalList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const posts = await getRentalPosts();
+        const formattedPosts = posts.map(post => ({
+          id: post.id,
+          location: post.processed_data?.location || 'Unknown',
+          price: post.processed_data?.price || 0,
+          rooms: post.processed_data?.number_of_rooms || 0,
+          type: post.processed_data?.room_or_apartment || 'Unknown',
+          status: post.processing_failed ? 'Failed' : 'Available'
+        }));
+        setRows(formattedPosts);
+      } catch (err) {
+        console.error('Error fetching posts:', err);
+        setError('Failed to load rental posts');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const columns = [
     {
@@ -57,7 +83,7 @@ const RentalList = () => {
       renderCell: (params) => (
         <Chip
           label={params.value}
-          color={params.value === 'Apartment' ? 'primary' : 'secondary'}
+          color={params.value === 'דירה' ? 'primary' : 'secondary'}
           size="small"
         />
       ),
@@ -76,17 +102,13 @@ const RentalList = () => {
     }
   ];
 
-  const rows = [
-    { 
-      id: 1, 
-      location: 'Tel Aviv - Florentin',
-      price: 4500,
-      rooms: 3,
-      type: 'Apartment',
-      status: 'Available'
-    },
-    // Add more sample data
-  ];
+  // Filter rows based on search term
+  const filteredRows = rows.filter(row => 
+    row.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) return <LinearProgress />;
+  if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
     <Paper sx={{ height: 700, width: '100%' }}>
@@ -108,7 +130,7 @@ const RentalList = () => {
         />
       </Box>
       <DataGrid
-        rows={rows}
+        rows={filteredRows}
         columns={columns}
         pageSize={pageSize}
         onPageSizeChange={setPageSize}

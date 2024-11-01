@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Layout from './components/layout/Layout';
+import RentalDashboard from './components/dashboard/RentalDashboard';
 import BotStats from './components/dashboard/BotStats';
 import RentalList from './components/rentals/RentalList';
-import Analytics from './components/rentals/Analytics';
+import {Analytics} from './components/rentals/Analytics';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -59,7 +60,7 @@ function App() {
       <Router>
         <Layout>
           <Routes>
-            <Route path="/" element={<BotStats />} />
+            <Route path="/" element={<RentalDashboard />} />
             <Route path="/bot-status" element={<BotStats />} />
             <Route path="/rentals" element={<RentalList />} />
             <Route path="/analytics" element={<Analytics />} />

@@ -1,5 +1,6 @@
 // src/components/layout/Layout.jsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
   CssBaseline,
@@ -73,6 +74,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 const Layout = ({ children }) => {
   const [open, setOpen] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const navigate = useNavigate();
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
@@ -80,6 +82,11 @@ const Layout = ({ children }) => {
     { text: 'Rentals', icon: <HomeIcon />, path: '/rentals' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
+
+  const handleMenuItemClick = (index, path) => {
+    setSelectedIndex(index);
+    navigate(path);
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -125,7 +132,7 @@ const Layout = ({ children }) => {
             <ListItem key={item.text} disablePadding>
               <ListItemButton
                 selected={selectedIndex === index}
-                onClick={() => setSelectedIndex(index)}
+                onClick={() => handleMenuItemClick(index, item.path)}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.text} />
